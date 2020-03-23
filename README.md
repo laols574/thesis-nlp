@@ -1,8 +1,8 @@
-# Objectives
+# Overview
 
-The learning objectives of this assignment are to:
-1. practice extracting n-gram features from text
-2. become familiar with training supervised classifiers
+This program classifies counterspeech samples through:
+1. extracting n-gram features from text
+2. using supervised classifiers
 
 # Setup your environment
 
