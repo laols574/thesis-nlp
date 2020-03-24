@@ -1,16 +1,16 @@
 """
-Project: n-grams classify 
+Project: n-grams classify
 Class: CSC 439
 Instructor: Bethard
 Author: Lauren Olson
 Description: This program has one function and three classes.
 
 The function "read_smsspam" reads in a spam file and creates an array of tuples
-where the first part of the tuple is a string that is the label of the sample and 
+where the first part of the tuple is a string that is the label of the sample and
 the second part is a string that is the sample feature.
 
-The class "TextToFeatures" uses the "CountVectorizer" class to read in these 
-features and create vectors 
+The class "TextToFeatures" uses the "CountVectorizer" class to read in these
+features and create vectors
 
 The class "TextToLabels" uses the "LabelEncoder" class to read in the labels
 and determine a vocabulary and create vectors associated with those labels
@@ -29,6 +29,7 @@ from collections import Counter
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
 NDArray = Union[np.ndarray, spmatrix]
 
@@ -47,11 +48,11 @@ def read_smsspam(smsspam_path: str) -> Iterator[Tuple[Text, Text]]:
     :param smsspam_path: The path of an SMSSpam file, formatted as above.
     :return: An iterator over (label, text) tuples.
     """
-    #read file into an array 
+    #read file into an array
     with open(smsspam_path) as f:
         file_array = f.readlines()
     array_of_tuples = create_tuples(file_array)
-    
+
     c = Counter(array_of_tuples)
 
     return list(c.elements())[0:-2] #use yield keyword to generate iterators instead
@@ -82,14 +83,14 @@ class TextToFeatures:
         :param texts: The training texts.
         """
         self.texts = texts
-        self.vectorizer = CountVectorizer(binary = True, ngram_range=(1, 2),token_pattern=r'\b\w+\b', min_df=1) 
-        #the vectorizer uses binary labels and 2 grams in order to optimize feature identification 
+        self.vectorizer = CountVectorizer(binary = False, ngram_range=(1, 1), max_df=1)
+        #the vectorizer uses binary labels and 2 grams in order to optimize feature identification
         analyze = self.vectorizer.build_analyzer()
         for text in texts:
             analyze(text)
         self.vectorizer.fit(texts)
 
-                    
+
 
     def index(self, feature: Text):
         """Returns the index in the vocabulary of the given feature value.
@@ -117,8 +118,8 @@ class TextToFeatures:
         :param texts: A sequence of texts.
         :return: A matrix, with one row of feature values for each text.
         """
-        return self.vectorizer.transform(texts) 
-    
+        return self.vectorizer.transform(texts)
+
 
 
 class TextToLabels:
@@ -157,17 +158,17 @@ class TextToLabels:
         :return: A vector, with one entry for each label.
         """
         return self.le.fit_transform(labels)
-        
+
 
 
 class Classifier:
     def __init__(self):
         """Initalizes a logistic regression classifier.
         """
-        self.clf = LogisticRegression(solver='liblinear', multi_class='ovr', dual=True, max_iter=1000) 
-        #the classifer uses liblinear, ovr and dual in order to maximize the classifier's ability 
+        self.clf = AdaBoostClassifier()
+        #the classifer uses liblinear, ovr and dual in order to maximize the classifier's ability
         #to do binary classification
-        
+
     def train(self, features: NDArray, labels: NDArray) -> None:
         """Trains the classifier using the given training examples.
 

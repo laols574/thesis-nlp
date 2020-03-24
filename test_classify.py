@@ -3,10 +3,23 @@ import pytest
 from sklearn.metrics import f1_score, accuracy_score
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import CountVectorizer
+
+from sklearn_porter import Porter
+
+#classifiers
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn_porter import Porter
+from sklearn.linear_model import LinearRegression
+
+#vectorizers
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import HashingVectorizer
 
 import classify
 
@@ -81,19 +94,23 @@ def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
 
     clf = MLPClassifier(max_iter=1000)
     pipeline = Pipeline([
-        ('vectorizer',  CountVectorizer()),
-        ('classifier',  clf) ])
+        ('vectorizer',  CountVectorizer(binary = False, ngram_range=(1, 1), max_df=1)),
+        ('classifier',  AdaBoostClassifier() )])
 
     #print(np.asarray(train_texts[1:5]))
-    k_fold = KFold(n_splits=6)
+    k_fold = KFold(n_splits=2)
+
+    #for LinearRegression
+    #full_labels = [0 if i == "no" else i for i in full_labels]
+    #full_labels = [1 if i == "yes" else i for i in full_labels]
 
     scores = []
-    for train_indices, test_indices in k_fold.split(np.asarray(full_texts)):
-        train_text = np.asarray(full_texts)[train_indices]
-        train_y    = np.asarray(full_labels)[train_indices]
+    for train_indices, test_indices in k_fold.split(np.array(full_texts)):
+        train_text = np.array(full_texts)[train_indices]
+        train_y    = np.array(full_labels)[train_indices]
 
-        test_text = np.asarray(full_texts)[test_indices]
-        test_y    = np.asarray(full_labels)[test_indices]
+        test_text = np.array(full_texts)[test_indices]
+        test_y    = np.array(full_labels)[test_indices]
 
         pipeline.fit(train_text, train_y)
         score = pipeline.score(test_text, test_y)
@@ -106,11 +123,11 @@ def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
             msg = "\n{:.1%} score on MTURK development data"
             print(msg.format(score))
 
-    f = open("classify.js", "w")
+    '''f = open("classify.js", "w")
     porter = Porter(clf, language='js')
     output = porter.export(embed_data=True)
     f.write(output)
-    f.close()
+    f.close()'''
 
     #NORMAL VALIDATION
     # get texts and labels from the training data
