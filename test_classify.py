@@ -2,6 +2,11 @@ import numpy as np
 import pytest
 from sklearn.metrics import f1_score, accuracy_score
 from sklearn.model_selection import KFold
+from sklearn.pipeline import Pipeline
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn_porter import Porter
 
 import classify
 
@@ -62,21 +67,56 @@ def test_labels():
     to_labels = classify.TextToLabels(labels)
 
     # make sure that some sample labels are encoded as expected
-    ham_index = to_labels.index("no")
-    spam_index = to_labels.index("yes")
-    assert ham_index != spam_index
+    nc_index = to_labels.index("no")
+    c_index = to_labels.index("yes")
+    assert nc_index != c_index
     assert np.all(to_labels(["no", "yes", "yes"]) ==
-                  [ham_index, spam_index, spam_index])
+                  [nc_index, c_index, c_index])
 
 
 def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
-    # get texts and labels from the training data
+    #K FOLD TEST
+    full_examples = classify.read_smsspam("AGBIG_annotation.outt")
+    full_labels, full_texts = zip(*full_examples)
 
+    clf = MLPClassifier(max_iter=1000)
+    pipeline = Pipeline([
+        ('vectorizer',  CountVectorizer()),
+        ('classifier',  clf) ])
+
+    #print(np.asarray(train_texts[1:5]))
+    k_fold = KFold(n_splits=6)
+
+    scores = []
+    for train_indices, test_indices in k_fold.split(np.asarray(full_texts)):
+        train_text = np.asarray(full_texts)[train_indices]
+        train_y    = np.asarray(full_labels)[train_indices]
+
+        test_text = np.asarray(full_texts)[test_indices]
+        test_y    = np.asarray(full_labels)[test_indices]
+
+        pipeline.fit(train_text, train_y)
+        score = pipeline.score(test_text, test_y)
+        scores.append(score)
+
+    score = sum(scores) / len(scores)
+    #KFOLD performance
+    if capsys is not None:
+        with capsys.disabled():
+            msg = "\n{:.1%} score on MTURK development data"
+            print(msg.format(score))
+
+    f = open("classify.js", "w")
+    porter = Porter(clf, language='js')
+    output = porter.export(embed_data=True)
+    f.write(output)
+    f.close()
+
+    #NORMAL VALIDATION
+    # get texts and labels from the training data
     train_examples = classify.read_smsspam("AGBIG_annotation.outt")
     train_labels, train_texts = zip(*train_examples)
 
-    #print(np.asarray(train_texts[1:5]))
-    #quit()
     # get texts and labels from the development data
     devel_examples = classify.read_smsspam("AGBIG_annotation.outd")
     devel_labels, devel_texts = zip(*devel_examples)
@@ -84,6 +124,7 @@ def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
     # create the feature extractor and label encoder
     to_features = classify.TextToFeatures(train_texts)
     to_labels = classify.TextToLabels(train_labels)
+
 
     # train the classifier on the training data aka fit
     classifier = classify.Classifier()
