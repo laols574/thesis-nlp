@@ -20,13 +20,12 @@ The following objects may come in handy:
 * [sklearn.linear_model.LogisticRegression]() 
 
 
-# Show results via pytest
+# Show results via pytest -p no:warnings
 ...
-collected 5 items                                                              
+test_classify.py .F.
+57.9% score on MTURK development data
 
-test_classify.py ...
-89.8% F1 and 97.4% accuracy on SMSSpam development data
-.x                                                   [100%]
+74.3% F1 and 59.2% accuracy on MTURK development data
 
 ===================== 4 passed, 1 xfailed in 1.59 seconds ======================
 ```
