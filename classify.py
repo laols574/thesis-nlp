@@ -98,6 +98,7 @@ class TextToFeatures:
         :param feature: A feature
         :return: The unique integer index associated with the feature.
         """
+
         count = 0
         for feature_name in self.vectorizer.get_feature_names():
             if(feature == feature_name):
@@ -165,7 +166,8 @@ class Classifier:
     def __init__(self):
         """Initalizes a logistic regression classifier.
         """
-        self.clf = AdaBoostClassifier()
+        self.clf = AdaBoostClassifier(); 
+
         #the classifer uses liblinear, ovr and dual in order to maximize the classifier's ability
         #to do binary classification
 

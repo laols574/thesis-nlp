@@ -56,7 +56,6 @@ def test_features():
     # extract features for some made-up sentences
     features = to_features(["There are some things that I need to send to you.",
                             "Hello!"])
-
     # make sure there is one row of features for each sentence
     assert len(features.shape) == 2
     n_rows, n_cols = features.shape
@@ -89,7 +88,7 @@ def test_labels():
 
 def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
     #K FOLD TEST
-    full_examples = classify.read_smsspam("AGBIG_annotation.outt")
+    full_examples = classify.read_smsspam("a_lil_more.out")
     full_labels, full_texts = zip(*full_examples)
 
     clf = MLPClassifier(max_iter=1000)
@@ -114,13 +113,19 @@ def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
 
         pipeline.fit(train_text, train_y)
         score = pipeline.score(test_text, test_y)
+        p = pipeline.predict(test_text)
+        p2 = pipeline.predict_proba(test_text)
         scores.append(score)
+    p_o = [j for j in p if j == "yes"]
+    p2_o = [p2[j] for j in range(0, len(p)) if p[j] == "yes"]
+
+    print("yes " , len(p_o) , " total " , len(p) , " proba " , p2_o[0])
 
     score = sum(scores) / len(scores)
     #KFOLD performance
     if capsys is not None:
         with capsys.disabled():
-            msg = "\n{:.1%} score on MTURK development data"
+            msg = "\n{:.1%} score on MTURK development data" + p
             print(msg.format(score))
 
     '''f = open("classify.js", "w")
@@ -142,7 +147,6 @@ def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
     to_features = classify.TextToFeatures(train_texts)
     to_labels = classify.TextToLabels(train_labels)
 
-
     # train the classifier on the training data aka fit
     classifier = classify.Classifier()
     classifier.train(to_features(train_texts), to_labels(train_labels))
@@ -150,6 +154,7 @@ def test_prediction(capsys, min_f1=0.89, min_accuracy=0.97):
     # make predictions on the development data
     predicted_indices = classifier.predict(to_features(devel_texts))
     assert np.array_equal(predicted_indices, predicted_indices.astype(bool))
+
 
     # measure performance of predictions
     devel_indices = to_labels(devel_labels)
