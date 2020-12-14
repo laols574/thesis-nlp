@@ -5,7 +5,7 @@ Instructor: Bethard
 Author: Lauren Olson
 Description: This program has one function and three classes.
 
-The function "read_smsspam" reads in a spam file and creates an array of tuples
+The function "read_smsspam" reads in a dataset and creates an array of tuples
 where the first part of the tuple is a string that is the label of the sample and
 the second part is a string that is the sample feature.
 
@@ -35,17 +35,17 @@ NDArray = Union[np.ndarray, spmatrix]
 
 
 def read_smsspam(smsspam_path: str) -> Iterator[Tuple[Text, Text]]:
-    """Generates (label, text) tuples from the lines in an SMSSpam file.
+    """Generates (label, text) tuples from the lines in dataset.
 
-    SMSSpam files contain one message per line. Each line is composed of a label
-    (ham or spam), a tab character, and the text of the SMS. Here are some
+    Files must contain one message per line. Each line is composed of a label
+    (no or yes), a tab character, and the text of the comment. Here are some
     examples:
 
-      spam	85233 FREE>Ringtone!Reply REAL
-      ham	I can take you at like noon
-      ham	Where is it. Is there any opening for mca.
+    yes Yeah a wall doesn't fix tunnels or airplanes must I keep going ?
+    no Those guarded walled in people say no this man knows why
+    no we do...we enforce those laws everyday
 
-    :param smsspam_path: The path of an SMSSpam file, formatted as above.
+    :param smsspam_path: The path of a file, formatted as above.
     :return: An iterator over (label, text) tuples.
     """
     #read file into an array
