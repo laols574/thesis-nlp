@@ -38,6 +38,11 @@ The following objects may come in handy:
 * [sklearn.preprocessing.LabelEncoder]()
 * [sklearn.linear_model.LogisticRegression]() 
 
+## References
+
+* CS 439 class materials 
+
+* scikit learn documentation
 
 # Show results via pytest -p no:warnings
 ...
@@ -49,8 +54,3 @@ test_classify.py .F.
 ===================== 4 passed, 1 xfailed in 1.59 seconds ======================
 ```
 
-## References
-
-* CS 439 class materials 
-
-* scikit learn documentation
