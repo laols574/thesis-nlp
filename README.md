@@ -32,8 +32,7 @@ To view more information about this project, please visit http://ec2-18-219-250-
 * [pytest](https://docs.pytest.org/)
 
 
-# Packages used
-The following objects may come in handy:
+# Packages primarily used:
 * [sklearn.feature_extraction.text.CountVectorizer]()
 * [sklearn.preprocessing.LabelEncoder]()
 * [sklearn.linear_model.LogisticRegression]() 
