@@ -1,7 +1,5 @@
 """
-Project: n-grams classify
-Class: CSC 439
-Instructor: Bethard
+Project: counterspeech classify
 Author: Lauren Olson
 Description: This program has one function and three classes.
 
