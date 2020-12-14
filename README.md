@@ -49,7 +49,7 @@ test_classify.py .F.
 ===================== 4 passed, 1 xfailed in 1.59 seconds ======================
 ```
 
-##References
+## References
 
 * CS 439 class materials 
 
